@@ -1,9 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+Dotenv.load
+
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/centos-7.2"
-  config.vm.network "forwarded_port", guest: 80, host: 8080
-  config.vm.network "private_network", ip: "192.168.33.10"
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false  
+  end
+  config.vm.network "forwarded_port", guest: 80, host: ENV['HOST_HTTP_PORT']
+  config.vm.network "private_network", ip: "#{ENV['PRIVATE_IP']}"
+  # config.vm.network "public_network", ip: "#{ENV['PUBLIC_IP']}", bridge: ENV['BRIDGE_INTERFACE']
   # ソースファイルの同期
   config.vm.synced_folder "../vagrant/src", "/home/vagrant/src", :mount_options => ['dmode=777', 'fmode=777']
   # プロビジョン時に使用するファイル群の同期
